@@ -17,6 +17,90 @@ void elibereazaActivitate(struct Activitate *act)
     free(act->prioritate);
     free(act);
 }
+bool validareDataLimita(char *numeaux)
+{
+        int zi,luna,an;
+        char *copie;
+        copie=(char *)malloc(12*sizeof(char));
+        strcpy(copie,numeaux);
+        char *p;
+        if(strlen(copie)==0 || strlen(copie)!=10)
+        {
+            return false;
+        }
+        if(copie[2]!='.' || copie[5]!='.')
+        {
+            return false;
+        }
+        p=strtok(copie,".");
+        if(p==NULL)
+        {
+            return false;
+        }
+        else
+        {
+            for(int i=0;i<strlen(p);i++)
+            {
+                if(p[i]<'0' && p[i]>'9')
+                {
+                    return false;
+                }
+            }
+        }
+        zi=atoi(p);
+        if(zi<1 || zi>32)
+        {
+            return false;
+        }
+        p=strtok(NULL,".");
+        if(p==NULL)
+        {
+            return false;
+        }
+        else
+        {
+            for(int i=0;i<strlen(p);i++)
+            {
+                if(p[i]<'0' && p[i]>'9')
+                {
+                    return false;
+                }
+            }
+        }
+        luna=atoi(p);
+        if(luna<1 || luna>12)
+        {
+            return false;
+        }
+        p=strtok(NULL,".");
+        if(p==NULL)
+        {
+            return false;
+        }
+        else
+        {
+            for(int i=0;i<strlen(p);i++)
+            {
+                if(p[i]<'0' && p[i]>'9')
+                {
+                    return false;
+                }
+            }
+        }
+        an=atoi(p);
+        for(int i=0;i<strlen(p);i++)
+            {
+                if(p[i]<'0' && p[i]>'9')
+                {
+                    return false;
+                }
+            }
+        if(an<0 || an>9999)
+        {
+            return false;
+        }
+        return true;
+}
 void adaugaActivitate(struct Activitate **prima)
 {
     struct Activitate *noua = (struct Activitate *)malloc(sizeof(struct Activitate));
@@ -48,12 +132,28 @@ void adaugaActivitate(struct Activitate **prima)
         printf("Prima data, doresc numele activitatii tale(maxim 100 de caractere)\n");
         fgets(noua->nume,100,stdin);
         noua->nume[strlen(noua->nume)-1]='\0';
+        while(strlen(noua->nume)==0)
+        {
+            printf("Numele introdus nu poate fi vid, adauga macar cateva caractere\n");
+            fgets(noua->nume,100,stdin);
+            noua->nume[strlen(noua->nume)-1]='\0';
+        }
         printf("Acum, descrierea ei(idem ca la atributul anterior)\n");
         fgets(noua->descriere,100,stdin);
         noua->descriere[strlen(noua->descriere)-1]='\0';
+        if(strlen(noua->descriere)==0)
+        {
+            strcpy(noua->descriere,"Fara descriere");
+        }
         printf("Acum, data limita(maxim 12 caractere)\n");
         fgets(noua->data_limita,12,stdin);
         noua->data_limita[strlen(noua->data_limita)-1]='\0';
+        while(!validareDataLimita(noua->data_limita))
+        {
+            printf("Data introdusa nu respecta formatul cerut, DD.MM.YYYY, introdu o data valida\n");
+            fgets(noua->data_limita,12,stdin);
+            noua->data_limita[strlen(noua->data_limita)-1]='\0';
+        }
         printf("In final, prioritatea activitatii:0-scazuta,1-medie,2-ridicata\n");
         scanf("%u",noua->prioritate);
         while(*noua->prioritate>2)
@@ -175,6 +275,12 @@ void meniuEditare()
             numeNou=(char *)malloc(100*sizeof(char));
             fgets(numeNou,100,stdin);
             numeNou[strlen(numeNou)-1]='\0';
+            while(strlen(numeNou)==0)
+        {
+            printf("Numele introdus nu poate fi vid, adauga macar cateva caractere\n");
+            fgets(numeNou,100,stdin);
+            numeNou[strlen(numeNou)-1]='\0';
+        }
             strcpy(temp->nume,numeNou);
             free(numeNou);
             break;
@@ -184,7 +290,15 @@ void meniuEditare()
             descriereNoua=(char *)malloc(100*sizeof(char));
             fgets(descriereNoua,100,stdin);
             descriereNoua[strlen(descriereNoua)-1]='\0';
+            if(strlen(descriereNoua)==0)
+        {
+            strcpy(descriereNoua,"Fara descriere");
+        }
+        else
+        {
+
             strcpy(temp->descriere,descriereNoua);
+        }
             free(descriereNoua);
             break;
             case 3:
@@ -193,6 +307,12 @@ void meniuEditare()
             data_noua=(char *)malloc(12*sizeof(char));
             fgets(data_noua,12,stdin);
             data_noua[strlen(data_noua)-1]='\0';
+            while(!validareDataLimita(data_noua))
+        {
+            printf("Data introdusa nu respecta formatul cerut, DD.MM.YYYY, introdu o data valida\n");
+            fgets(data_noua,12,stdin);
+            data_noua[strlen(data_noua)-1]='\0';
+        }
             strcpy(temp->data_limita,data_noua);
             free(data_noua);
             break;
@@ -201,6 +321,11 @@ void meniuEditare()
             unsigned int *prioritateNoua;
             prioritateNoua=(unsigned int*)malloc(sizeof(unsigned int));
             scanf("%u",prioritateNoua);
+            while(*prioritateNoua>2)
+        {
+            printf("Prioritatea introdusa nu este valida. Alege un numar valid pentru prioritate\n");
+            scanf("%u",prioritateNoua);
+        }
             temp->prioritate=prioritateNoua;
             getchar();
             break;
